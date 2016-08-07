@@ -29,10 +29,15 @@ void check_error(CGLError err) {
 
 void init_opengl()
 {
+	/* Display */
+	CGOpenGLDisplayMask display_mask = CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay);
+
+	/* Context */
 	CGLPixelFormatObj pix;
 	GLint npix;
+
 	CGLPixelFormatAttribute attribs[] = {
-		kCGLPFADisplayMask, 0,
+		kCGLPFADisplayMask, display_mask,
 		kCGLPFAOpenGLProfile, (CGLPixelFormatAttribute)kCGLOGLPVersion_3_2_Core,
 		kCGLPFAColorSize, 24,
 		kCGLPFAAlphaSize, 8,
@@ -44,15 +49,12 @@ void init_opengl()
 		0
 	};
 
-	/* Display */
-	CGDirectDisplayID display = CGMainDisplayID();
-	attribs[1] = CGDisplayIDToOpenGLDisplayMask(display);
-
 
 	/* Context init. */
 	check_error(CGLChoosePixelFormat(attribs, &pix, &npix));
 	check_error(CGLCreateContext(pix, NULL, &gl_context));
 	CGLReleasePixelFormat(pix);
+	check_error(CGLClearDrawable(gl_context));
 
 	/* Tests and params. */
 //	GLint vsync = 1;
@@ -72,7 +74,9 @@ void init_opengl()
 	/*check_error(CGLLockContext(gl_context));*/
 
 	/* FIXME: Deprecated, find another way to grab screen. */
-	check_error(CGLSetFullScreenOnDisplay(gl_context, attribs[1]));
+	/* WTF: Can't use previously assigned display_mask... */
+	check_error(CGLSetFullScreenOnDisplay(gl_context,
+			CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay)));
 }
 
 void render_triangle()

@@ -156,11 +156,6 @@ void render_triangle()
 
 		check_error(CGLFlushDrawable(gl_context));
 	}
-
-
-
-	glUseProgram(shader_program);
-
 }
 
 int main(int argc, char** argv) {

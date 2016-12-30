@@ -6,19 +6,9 @@
 #include <CoreGraphics/CGDirectDisplay.h>
 #include <OpenGL/gl3.h>
 
-CGLContextObj gl_context;
+#include "triangle_shader.h"
 
-const GLchar* vertexShaderSource = "#version 330 core\n"
-	"layout (location = 0) in vec3 position;\n"
-	"void main()\n"
-	"{\n"
-	"gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
-	"}\0";
-const GLchar* fragmentShaderSource = "#version 330 core\n"
-	"out vec4 color;\n"
-	"void main() {\n"
-	"color = vec4(1.0, 0.5, 0.2, 1.0);\n"
-	"}\0";
+CGLContextObj gl_context;
 
 void check_error(CGLError err) {
 	if (err == kCGLNoError)
@@ -55,21 +45,6 @@ void init_opengl()
 	check_error(CGLCreateContext(pix, NULL, &gl_context));
 	CGLReleasePixelFormat(pix);
 	check_error(CGLClearDrawable(gl_context));
-
-	/* Tests and params. */
-//	GLint vsync = 1;
-//	check_error(CGLSetParameter(gl_context, kCGLCPSwapInterval, &vsync));
-//	GLint opaque = 0.8;
-//	check_error(CGLSetParameter (gl_context, kCGLCPSurfaceOpacity, &opaque));
-
-	GLint fragGPU, vertGPU;
-	CGLGetParameter(CGLGetCurrentContext(), kCGLCPGPUFragmentProcessing,
-			&fragGPU);
-	CGLGetParameter(CGLGetCurrentContext(), kCGLCPGPUVertexProcessing,
-			&vertGPU);
-	printf("GPU fragments : %d, GPU vertex : %d\n", fragGPU, vertGPU);
-
-
 	check_error(CGLSetCurrentContext(gl_context));
 	/*check_error(CGLLockContext(gl_context));*/
 
@@ -107,10 +82,13 @@ void render_triangle()
 	glBindVertexArray(0); // Unbind because we could misconfigure.
 
 	/* Shader stuff */
+	GLuint shader_program = glCreateProgram();
+
 	GLuint vertex_shader_id;
 	vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertex_shader_id, 1, &vertexShaderSource, NULL);
 	glCompileShader(vertex_shader_id);
+	glAttachShader(shader_program, vertex_shader_id);
 
 	GLint s;
 	GLchar info_log[512];
@@ -124,6 +102,7 @@ void render_triangle()
 	fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragment_shader_id, 1, &fragmentShaderSource, NULL);
 	glCompileShader(fragment_shader_id);
+	glAttachShader(shader_program, fragment_shader_id);
 
 	glGetShaderiv(fragment_shader_id, GL_COMPILE_STATUS, &s);
 	if (!s) {
@@ -131,11 +110,9 @@ void render_triangle()
 		printf("Error compiling shader : %s", info_log);
 	}
 
-	GLuint shader_program;
-	shader_program = glCreateProgram();
-	glAttachShader(shader_program, vertex_shader_id);
-	glAttachShader(shader_program, fragment_shader_id);
 	glLinkProgram(shader_program);
+	glUseProgram(shader_program);
+
 	glDeleteShader(vertex_shader_id);
 	glDeleteShader(fragment_shader_id);
 
@@ -145,11 +122,9 @@ void render_triangle()
 		printf("Error compiling shader : %s", info_log);
 	}
 
-
 	while(true) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		glUseProgram(shader_program);
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindVertexArray(0);

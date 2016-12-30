@@ -1,19 +1,6 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(c_triangles)
 
-# Include uses based paths, start at src/.
-#include_directories(src)
-
-# Add sources using GLOB pattern.
-#file(GLOB_RECURSE SOURCES "src/*.c")
-
-# Build target.
-#add_executable(c_engine ${SOURCES})
-
-# C11
-#set_property(TARGET c_engine PROPERTY C_STANDARD 11)
-
-# Do OS X application stuff.
 if (APPLE)
 	set(OSX_OPENGL_SRC src/osx_opengl.c)
 	add_executable(osx_opengl ${OSX_OPENGL_SRC})
@@ -24,9 +11,16 @@ if (APPLE)
 	find_library(CG CoreGraphics)
 	target_link_libraries(osx_opengl ${OGL})
 	target_link_libraries(osx_opengl ${CG})
-
-	# Linker step.
-	#target_link_libraries(VoronoiEve "${PROJECT_SOURCE_DIR}/libs/osx/libboost_system-mt.a")
-
 endif(APPLE)
 
+if (WIN32)
+	set(WIN_OPENGL_SRC src/win_opengl.c)
+	add_executable(win_opengl WIN32 ${WIN_OPENGL_SRC})
+	find_package(OpenGL REQUIRED)
+	target_link_libraries(win_opengl ${OPENGL_LIBRARIES})
+	#set(CMAKE_C_FLAGS "/Gz /fp:except- /Gy /Oi /GF /Os /fp:fast /Ob1 /Oy /O2 /MT /GS- /Zp1")
+	#set_property(TARGET win_opengl PROPERTY LINK_FLAGS "/NODEFAULTLIB /DYNAMICBASE:NO /MACHINE:X86 /MANIFEST:NO")
+	#/ENTRY:\"entrypoint\"
+
+
+endif(WIN32)

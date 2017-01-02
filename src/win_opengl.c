@@ -4,7 +4,7 @@
 #include <math.h>
 #include <GL/gl.h>
 #include "glext.h" //https://www.opengl.org/registry/
-#include "triangle_shader.h"
+#include "opengl_shader.h"
 
 #include <stdio.h>
 

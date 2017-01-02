@@ -6,7 +6,7 @@
 #include <CoreGraphics/CGDirectDisplay.h>
 #include <OpenGL/gl3.h>
 
-#include "triangle_shader.h"
+#include "opengl_shader.h"
 
 CGLContextObj gl_context;
 

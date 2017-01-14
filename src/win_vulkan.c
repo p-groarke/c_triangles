@@ -904,9 +904,39 @@ void init_vk_pipeline()
 
 	/* Creating Shaders. */
 	{
-//		uint32_t* vert_code = NULL;
-//		size_t vert_size = 0;
-//		load_vertex_shader(&vert_code, &vert_size);
+		FILE* f = fopen("win_vulkan_vert.spv", "rb");
+		if (!f) {
+			char result[256];
+			GetCurrentDirectory(256, result);
+			printf("Unable to read %s win_vulkan_vert.spv\n", result);
+			exit(-1);
+		}
+
+		fseek(f, 0, SEEK_END);
+		size_t filesize = ftell(f);
+		fseek(f, 0, SEEK_SET);
+
+		uint32_t* vert_code = (uint32_t*)malloc(filesize);
+		fread(vert_code, 1, filesize, f);
+		fclose(f);
+
+
+		f = fopen("win_vulkan_frag.spv", "rb");
+		if (!f) {
+			char result[256];
+			GetCurrentDirectory(256, result);
+			printf("Unable to read %s win_vulkan_frag.spv\n", result);
+			exit(-1);
+		}
+
+		fseek(f, 0, SEEK_END);
+		filesize = ftell(f);
+		fseek(f, 0, SEEK_SET);
+
+		uint32_t* frag_code = (uint32_t*)malloc(filesize);
+		fread(vert_code, 1, filesize, f);
+		fclose(f);
+
 	}
 
 }

@@ -33,4 +33,6 @@ if (WIN32)
 	target_link_libraries(win_vulkan ${vul})
 	include_directories($ENV{VULKAN_SDK}/Include)
 
+	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/win_vulkan_frag.spv DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/win_vulkan_vert.spv DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif(WIN32)
